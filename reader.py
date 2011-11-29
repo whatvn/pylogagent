@@ -19,10 +19,12 @@ class Reader(object):
 			cp = p.read()
 			print "last possition: " + cp 
 			print "current possition: " + str(f.tell())
-			if f.tell() != cp:
+			if (f.tell() + 3)  != int(cp):
 				print "Read next!"
 				lt = self._readnext(cp)
-			f.close() 
+			else: return 
+			f.close()
+
 			return lt
 		else:
 			print "Read log file 1st time!" 

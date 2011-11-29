@@ -1,9 +1,11 @@
 #!/usr/bin/env python 
 # Start our program as a daemon
 
-from daemon import daemon
+from  daemon import daemon 
 from reader import __worker
 
-with daemon.DaemonContext():
-    worker()
+print "aaaaa"
+with daemon.DaemonContext(pidfile="agent.pid"):
+	print "starting logging agent....."
+	__worker() 
 
