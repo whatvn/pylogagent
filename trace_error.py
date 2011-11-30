@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 #Run this file to track errors
-from reader import __worker 
+from reader import _worker 
 
-__worker() 
+_worker() 
