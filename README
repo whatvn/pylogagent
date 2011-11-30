@@ -30,7 +30,7 @@ These line above will make syslog-ng server listen for log on udp port 514, when
 /data/log/nginx_error.log
 
 2. Start logagent
-python logagent.py
+python agent 
 
 3. Configure syslog-ng client
 
