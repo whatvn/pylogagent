@@ -7,32 +7,42 @@ def main():
 
 
 if __name__ == "__main__":
-    # do the UNIX double-fork magic, see Stevens' "Advanced 
-    # Programming in the UNIX Environment" for details (ISBN 0201563177)
-    try: 
-        pid = os.fork() 
-        if pid > 0:
-            # exit first parent
-            sys.exit(0) 
-    except OSError, e: 
-        print >>sys.stderr, "fork #1 failed: %d (%s)" % (e.errno, e.strerror) 
-        sys.exit(1)
+	stdin   ="/dev/null"
+	stderr  ="/dev/null"
+	stdout ="/dev/null"
+	pidfile = "/tmp/agent.pid"
+	try: 
+		pid = os.fork() 
+		if pid > 0:
+			sys.exit(0) 
+	except OSError, e: 
+		print >>sys.stderr, "fork #1 failed: %d (%s)" % (e.errno, e.strerror) 
+		sys.exit(1)
 
-    # decouple from parent environment
-    os.chdir(".") 
-    os.setsid() 
-    os.umask(0) 
+	# decouple from parent environment
+	os.chdir(".") 
+	os.setsid() 
+	os.umask(0) 
+	sys.stdout.flush() 
+	sys.stderr.flush() 
+	si = open(stdin, 'r') 
+	so = open(stdout, 'a+') 
+	se = open(stderr, 'a+', 0)
+	print si.fileno() 
+	print sys.stdin.fileno() 
+	os.dup2(int(si.fileno()), int(sys.stdin.fileno()))
+	os.dup2(int(so.fileno()), int(sys.stdout.fileno()) ) 
+	os.dup2( int (se.fileno() ), int (sys.stderr.fileno()) ) 
+	pid = str(os.getpid()) 
+	file(pidfile,'w+').write("%s\n" % pid)
+	try: 
+		pid = os.fork() 
+		if pid > 0:
+			# exit from second parent, print eventual PID before
+			print "Daemon PID %d" % pid 
+			sys.exit(0) 
+	except OSError, e: 
+		print >>sys.stderr, "fork #2 failed: %d (%s)" % (e.errno, e.strerror) 
+		sys.exit(1) 
 
-    # do second fork
-    try: 
-        pid = os.fork() 
-        if pid > 0:
-            # exit from second parent, print eventual PID before
-            print "Daemon PID %d" % pid 
-            sys.exit(0) 
-    except OSError, e: 
-        print >>sys.stderr, "fork #2 failed: %d (%s)" % (e.errno, e.strerror) 
-        sys.exit(1) 
-    main() 
-
-
+	main() 
