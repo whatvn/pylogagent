@@ -41,8 +41,8 @@ class Reader(object):
 				f.seek(-3,2)
 				p  = open(dbfile)
 				cp = p.read()
-				print "last possition: " + cp 
-				print "current possition: " + str(f.tell())
+				print "last position: " + cp 
+				print "current position: " + str(f.tell())
 				if (f.tell() + 3)  != int(cp):
 					print "Read next!"
 					lt = self._readnext(cp)
@@ -61,34 +61,27 @@ class Reader(object):
 			for line in f:
 				line = dbfile.split('.')[0] + ": "  + line
 				lt.add(line) 
-			current_possition = f.tell()
+			current_position = f.tell()
 			with open(dbfile,'w') as db:
-				db.write(str(current_possition))
+				db.write(str(current_position))
 			f.close()
 			return lt 
 	
-	def _readnext(self, possition):
+	def _readnext(self, position):
 		"""
 		If files are updated, use this function
 		"""
 		dbfile = self.logfile.split('/')[-1].strip()
 		with open(self.logfile.strip()) as f: 
 			lt = set()
-			print "possition: %s"  %(possition)
-			f.seek(int(possition))
+			print "position: %s"  %(position)
+			f.seek(int(position))
 			for line in f:
 				line = dbfile.split('.')[0] + ": "  + line  
 				lt.add(line)	
 			with open(dbfile,'w') as db:
 				db.write(str(f.tell())) 
 			return lt	
-
-#	def _log(self, line):
-#		"""Put lines to log socket"""
-#		s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-#		s.connect('/dev/log')
-#		s.send(line)
-#		s.close()          
 
 def _worker():
 	while True:
@@ -110,5 +103,3 @@ def _worker():
 				else: continue
 			time.sleep(5)
 
-
-	
