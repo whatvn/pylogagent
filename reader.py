@@ -16,7 +16,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-import socket
+import socket, lsocket
 import sys
 import os, time
 import atexit
@@ -78,17 +78,17 @@ class Reader(object):
 			f.seek(int(possition))
 			for line in f:
 				line = dbfile.split('.')[0] + ": "  + line  
-				lt.add(line) 	
+				lt.add(line)	
 			with open(dbfile,'w') as db:
 				db.write(str(f.tell())) 
-			return lt 	
+			return lt	
 
-	def _log(self, line):
-		"""Put lines to log socket"""
-		s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-		s.connect('/dev/log')
-		s.send(line)
-		s.close()          
+#	def _log(self, line):
+#		"""Put lines to log socket"""
+#		s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+#		s.connect('/dev/log')
+#		s.send(line)
+#		s.close()          
 
 def _worker():
 	while True:
@@ -98,11 +98,14 @@ def _worker():
 				logger = Reader(f)
 				logs   = logger._readfirst() 
 				if logs is not None:
+					log_socket = socket.socket( socket.AF_UNIX, socket.SOCK_STREAM ) 
+					s = lsocket.Lsocket(log_socket)
+					s._lconnect() 
 					try:
 						for line in logs:
-							if line: 
-								logger._log(line)
+							if line: s.sendStream(line)
 							else: break 
+						s._ldisconnect() 
 					except TypeError: pass
 				else: continue
 			time.sleep(5)
