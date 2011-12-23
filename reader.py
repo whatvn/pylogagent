@@ -40,12 +40,18 @@ class Reader(object):
 				f = open(self.logfile.strip()) 
 				f.seek(-3,2)
 				p  = open(dbfile)
-				cp = p.read()
-				print "last position: " + cp 
+				lp = p.read()
+				print "last position: " + lp 
 				print "current position: " + str(f.tell())
-				if (f.tell() + 3)  != int(cp):
+				cp = f.tell() + 3 
+				if ( cp  != int(lp) ):
 					print "Read next!"
-					lt = self._readnext(cp)
+					if (cp > lp): lt = self._readnext(lp)
+					else:
+						# Log file was rotated, read from the beginning 
+						print "Rotated: Reset position to 0"
+						lp = 0
+						lt = self._readnext(lp) 
 				else:
 					f.close() 
 					return 
